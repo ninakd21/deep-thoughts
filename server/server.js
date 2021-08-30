@@ -9,13 +9,20 @@ const db = require('./config/connection');
 const PORT = process.env.PORT || 3001;
 const app = express();
 // create a new Apollo server and pass in our schema data
-const server = new ApolloServer({
-  typeDefs,
-  resolvers
-});
+
+
 
 // integrate our Apollo server with the Express application as middleware
-server.applyMiddleware({ app });
+let apolloServer = null;
+async function startServer() {
+    apolloServer = new ApolloServer({
+        typeDefs,
+        resolvers,
+    });
+    await apolloServer.start();
+    apolloServer.applyMiddleware({ app });
+}
+startServer();
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
