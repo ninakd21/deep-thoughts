@@ -1,82 +1,47 @@
-import React, { useState } from 'react';
-import { useMutation } from '@apollo/client';
-import { ADD_USER } from '../utils/mutations';
+import React from 'react';
+import { useParams } from 'react-router-dom';
+
+import ReactionList from '../components/ReactionList';
+import ReactionForm from '../components/ReactionForm';
+
 import Auth from '../utils/auth';
+import { useQuery } from '@apollo/client';
+import { QUERY_THOUGHT } from '../utils/queries';
 
-const Signup = () => {
-  const [formState, setFormState] = useState({ username: '', email: '', password: '' });
-  const [addUser, { error }] = useMutation(ADD_USER);
+const SingleThought = (props) => {
+  const { id: thoughtId } = useParams();
 
-  // update state based on form input changes
-  const handleChange = (event) => {
-    const { name, value } = event.target;
+  const { loading, data } = useQuery(QUERY_THOUGHT, {
+    variables: { id: thoughtId },
+  });
 
-    setFormState({
-      ...formState,
-      [name]: value,
-    });
-  };
+  const thought = data?.thought || {};
 
-  // submit form
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
-
-  // user try/catch instead of promises to handle errors
-    try {
-      // execute addUser mutation and pass in variable data from form
-      const { data } = await addUser({
-        variables: { ...formState }
-      });
-      Auth.login(data.addUser.token);
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <main className='flex-row justify-center mb-4'>
-      <div className='col-12 col-md-6'>
-        <div className='card'>
-          <h4 className='card-header'>Sign Up</h4>
-          <div className='card-body'>
-            <form onSubmit={handleFormSubmit}>
-              <input
-                className='form-input'
-                placeholder='Your username'
-                name='username'
-                type='username'
-                id='username'
-                value={formState.username}
-                onChange={handleChange}
-              />
-              <input
-                className='form-input'
-                placeholder='Your email'
-                name='email'
-                type='email'
-                id='email'
-                value={formState.email}
-                onChange={handleChange}
-              />
-              <input
-                className='form-input'
-                placeholder='******'
-                name='password'
-                type='password'
-                id='password'
-                value={formState.password}
-                onChange={handleChange}
-              />
-              <button className='btn d-block w-100' type='submit'>
-                Submit
-              </button>
-            </form>
-            {error && <div>Signup failed</div>}
-          </div>
+    <div>
+      <div className="card mb-3">
+        <p className="card-header">
+          <span style={{ fontWeight: 700 }} className="text-light">
+            {thought.username}
+          </span>{' '}
+          thought on {thought.createdAt}
+        </p>
+        <div className="card-body">
+          <p>{thought.thoughtText}</p>
         </div>
       </div>
-    </main>
+
+      {thought.reactionCount > 0 && (
+        <ReactionList reactions={thought.reactions} />
+      )}
+
+      {Auth.loggedIn() && <ReactionForm thoughtId={thought._id} />}
+    </div>
   );
 };
 
-export default Signup;
+export default SingleThought;
