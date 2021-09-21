@@ -1,7 +1,6 @@
 {
   "name": "mern-social-media",
   "version": "1.0.0",
-  "description": "",
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
@@ -15,5 +14,14 @@
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^5.1.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ninakd21/deep-thoughts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ninakd21/deep-thoughts/issues"
+  },
+  "homepage": "https://github.com/ninakd21/deep-thoughts#readme",
+  "description": ""
 }
